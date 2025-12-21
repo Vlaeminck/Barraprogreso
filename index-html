@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Barra de progreso por días</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      width: 360px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 25px;
+      background-color: #e0e0e0;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 15px 0;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background-color: #4caf50;
+      transition: width 0.6s ease;
+    }
+
+    p {
+      font-size: 14px;
+      color: #555;
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <h2>Progreso del período</h2>
+
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <p id="progressText"></p>
+  </div>
+
+  <script>
+    function updateProgress() {
+      // 📅 PERÍODO (cruza de año)
+      const startDate = new Date(2024, 11, 15); // 15 diciembre 2024
+      const endDate   = new Date(2025, 0, 27);  // 27 enero 2025
+
+      // 🕛 Normalizar a medianoche para evitar errores
+      const today = new Date();
+      today.setHours(0,0,0,0);
+      startDate.setHours(0,0,0,0);
+      endDate.setHours(0,0,0,0);
+
+      const totalDays =
+        (endDate - startDate) / (1000 * 60 * 60 * 24);
+
+      const elapsedDays = Math.min(
+        Math.max(
+          (today - startDate) / (1000 * 60 * 60 * 24),
+          0
+        ),
+        totalDays
+      );
+
+      const progressPercent = (elapsedDays / totalDays) * 100;
+
+      document.getElementById("progressBar").style.width =
+        progressPercent.toFixed(2) + "%";
+
+      document.getElementById("progressText").textContent =
+        `Días transcurridos: ${Math.floor(elapsedDays)} de ${Math.floor(totalDays)} (${progressPercent.toFixed(1)}%)`;
+    }
+
+    // ▶️ Ejecutar al cargar
+    updateProgress();
+
+    // 🔄 Actualizar automáticamente una vez por día
+    setInterval(updateProgress, 1000 * 60 * 60 * 24);
+  </script>
+
+</body>
+</html>
