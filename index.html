@@ -61,43 +61,45 @@
   </div>
 
   <script>
-    function updateProgress() {
-      // 📅 PERÍODO FIJO
-      const startDate = new Date(2024, 11, 15); // 15 diciembre 2024
-      const endDate   = new Date(2025, 0, 27);  // 27 enero 2025
+  function updateProgress() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-      // 🕛 Normalizar a medianoche
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      startDate.setHours(0, 0, 0, 0);
-      endDate.setHours(0, 0, 0, 0);
+    const year = today.getMonth() === 11
+      ? today.getFullYear()
+      : today.getFullYear() - 1;
 
-      const totalDays =
-        (endDate - startDate) / (1000 * 60 * 60 * 24);
+    // Período dinámico
+    const startDate = new Date(year, 11, 15);      // 15 diciembre
+    const endDate   = new Date(year + 1, 0, 27);   // 27 enero siguiente
 
-      const elapsedDays = Math.min(
-        Math.max(
-          (today - startDate) / (1000 * 60 * 60 * 24),
-          0
-        ),
-        totalDays
-      );
+    startDate.setHours(0, 0, 0, 0);
+    endDate.setHours(0, 0, 0, 0);
 
-      const progressPercent = (elapsedDays / totalDays) * 100;
+    const totalDays =
+      (endDate - startDate) / (1000 * 60 * 60 * 24);
 
-      document.getElementById("progressBar").style.width =
-        progressPercent.toFixed(2) + "%";
+    const elapsedDays = Math.min(
+      Math.max(
+        (today - startDate) / (1000 * 60 * 60 * 24),
+        0
+      ),
+      totalDays
+    );
 
-      document.getElementById("progressText").textContent =
-        `Hoy: ${today.toLocaleDateString("es-ES")} · Día ${Math.floor(elapsedDays) + 1} de ${Math.floor(totalDays)}`;
-    }
+    const progressPercent = (elapsedDays / totalDays) * 100;
 
-    // Ejecutar al cargar
-    updateProgress();
+    document.getElementById("progressBar").style.width =
+      progressPercent.toFixed(2) + "%";
 
-    // Recalcular automáticamente cada día
-    setInterval(updateProgress, 1000 * 60 * 60 * 24);
-  </script>
+    document.getElementById("progressText").textContent =
+      `Días transcurridos: ${Math.floor(elapsedDays)} de ${Math.floor(totalDays)} (${progressPercent.toFixed(1)}%)`;
+  }
+
+  updateProgress();
+  setInterval(updateProgress, 1000 * 60 * 60 * 24);
+</script>
+
 
 </body>
 </html>
