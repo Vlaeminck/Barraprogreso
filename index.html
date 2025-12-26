@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: transparent; /* ideal para Notion */
+      background-color: transparent;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -43,7 +43,37 @@
     p {
       font-size: 13px;
       color: #555;
-      margin: 0;
+      margin: 4px 0;
+    }
+
+    /* === HORARIOS === */
+    .timezones {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+      align-items: center;
+    }
+
+    .tz {
+      display: flex;
+      align-items: center;
+      width: 220px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .country {
+      width: 120px;
+      text-align: left;
+      color: #444;
+    }
+
+    .time {
+      width: 60px;
+      text-align: right;
+      font-weight: 600;
+      color: #000;
     }
   </style>
 </head>
@@ -58,48 +88,88 @@
     </div>
 
     <p id="progressText"></p>
+
+    <div class="timezones">
+      <div class="tz">
+        <span class="country">Argentina</span>
+        <span class="time" id="ar"></span>
+      </div>
+
+      <div class="tz">
+        <span class="country">Colombia</span>
+        <span class="time" id="co"></span>
+      </div>
+
+      <div class="tz">
+        <span class="country">Chile</span>
+        <span class="time" id="cl"></span>
+      </div>
+
+      <div class="tz">
+        <span class="country">México</span>
+        <span class="time" id="mx"></span>
+      </div>
+
+      <div class="tz">
+        <span class="country">UTC</span>
+        <span class="time" id="utc"></span>
+      </div>
+    </div>
   </div>
 
   <script>
-  function updateProgress() {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    function updateProgress() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
 
-    const year = today.getMonth() === 11
-      ? today.getFullYear()
-      : today.getFullYear() - 1;
+      const year = today.getMonth() === 11
+        ? today.getFullYear()
+        : today.getFullYear() - 1;
 
-    // Período dinámico
-    const startDate = new Date(year, 11, 15);      // 15 diciembre
-    const endDate   = new Date(year + 1, 0, 27);   // 27 enero siguiente
+      const startDate = new Date(year, 11, 15);
+      const endDate   = new Date(year + 1, 0, 27);
 
-    startDate.setHours(0, 0, 0, 0);
-    endDate.setHours(0, 0, 0, 0);
+      startDate.setHours(0, 0, 0, 0);
+      endDate.setHours(0, 0, 0, 0);
 
-    const totalDays =
-      (endDate - startDate) / (1000 * 60 * 60 * 24);
+      const totalDays = (endDate - startDate) / (1000 * 60 * 60 * 24);
+      const elapsedDays = Math.min(
+        Math.max((today - startDate) / (1000 * 60 * 60 * 24), 0),
+        totalDays
+      );
 
-    const elapsedDays = Math.min(
-      Math.max(
-        (today - startDate) / (1000 * 60 * 60 * 24),
-        0
-      ),
-      totalDays
-    );
+      const progressPercent = (elapsedDays / totalDays) * 100;
 
-    const progressPercent = (elapsedDays / totalDays) * 100;
+      document.getElementById("progressBar").style.width =
+        progressPercent.toFixed(1) + "%";
 
-    document.getElementById("progressBar").style.width =
-      progressPercent.toFixed(2) + "%";
+      document.getElementById("progressText").textContent =
+        `Días transcurridos: ${Math.floor(elapsedDays)} de ${Math.floor(totalDays)} (${progressPercent.toFixed(1)}%)`;
+    }
 
-    document.getElementById("progressText").textContent =
-      `Días transcurridos: ${Math.floor(elapsedDays)} de ${Math.floor(totalDays)} (${progressPercent.toFixed(1)}%)`;
-  }
+    function formatTime(zone) {
+      return new Intl.DateTimeFormat("es-AR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        timeZone: zone
+      }).format(new Date());
+    }
 
-  updateProgress();
-  setInterval(updateProgress, 1000 * 60 * 60 * 24);
-</script>
+    function updateTimes() {
+      document.getElementById("ar").textContent  = formatTime("America/Argentina/Buenos_Aires");
+      document.getElementById("co").textContent  = formatTime("America/Bogota");
+      document.getElementById("cl").textContent  = formatTime("America/Santiago");
+      document.getElementById("mx").textContent  = formatTime("America/Mexico_City");
+      document.getElementById("utc").textContent = formatTime("UTC");
+    }
 
+    updateProgress();
+    updateTimes();
+
+    setInterval(updateProgress, 1000 * 60 * 60 * 24);
+    setInterval(updateTimes, 1000 * 60);
+  </script>
 
 </body>
 </html>
